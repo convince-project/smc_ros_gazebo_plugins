@@ -1,0 +1,69 @@
+{
+    "storm_parameters": {
+        "computed": {
+            "model": {
+                "package_name": "gz_sim_handler",
+                "path":"jani/refined_controller_model.jani"
+            },
+            "plugin-paths": {
+                "package_name":"gazebo_smc_plugins",
+                "path": "lib/gazebo_smc_plugins"
+            }
+        },
+        "fixed":{
+            "properties-names": "driving",
+            "batch-size": "1",
+            "max-n-traces": "400",
+            "disable-explored-states-caching": true,
+            "n-threads": "4",
+            "traces-folder": "/tmp/refined_controller",
+            "append-date": true,
+            "show-statistics": true
+        }
+    },
+    "spawner_parameters": {
+        "max_threads": 5,
+        "command": "ros2 launch gz_sim_handler start_gazebo_and_bridge_launch.py",
+        "simulation_parameters": {
+            "bridge_configuration": {
+                "package_name": "gz_sim_handler",
+                "file": "config/ros_bridge.yaml"
+            },
+            "gazebo": {
+                "world": {
+                    "package_name": "gz_sim_handler",
+                    "path": "worlds",
+                    "file": "turtlebot3_world.sdf"
+                },
+                "parameters": [
+                    "-v", "1",
+                    "-s", "--headless-rendering"
+                ]
+            },
+            "robots": [
+                {
+                    "file": {
+                        "package_name": "turtlebot3_gazebo",
+                        "path": "models",
+                        "file": "turtlebot3_waffle/model.sdf"
+                    },
+                    "fixed_parameters": {
+                        "-entity": "waffle",
+                        "-name": "waffle",
+                        "-allow_renaming": "true",
+                        "-x": "-2.0",
+                        "-y": "-0.5",
+                        "-z": "0.01",
+                        "-Y": "0.0"
+                    }
+                }
+            ],
+            "additional_nodes": [
+                {
+                    "package_name": "gz_sim_handler",
+                    "node_name": "scan_processor_node"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,55 @@
+# Gazebo to ROS Bridge
+
+# SERVICES
+
+- service_name: "world/default/control"
+  ros_type_name: "ros_gz_interfaces/srv/ControlWorld"
+  gz_req_type_name: "gz.msgs.WorldControl"
+  gz_rep_type_name: "gz.msgs.Boolean"
+
+# TOPICS
+
+# gz topic published by the simulator core
+# Clock
+- ros_topic_name: "clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  subscriber_queue: 1
+  publisher_queue: 1
+  lazy: false
+  direction: GZ_TO_ROS
+
+# gz topic publishing data
+- ros_topic_name: "scan"
+  gz_topic_name: "/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  subscriber_queue: 1
+  publisher_queue: 1
+  lazy: false
+  direction: GZ_TO_ROS
+
+# gz topic publishing the current ground truth of the robot position
+- ros_topic_name: "robot_pose"
+  gz_topic_name: "/world/default/dynamic_pose/info"
+  ros_type_name: "geometry_msgs/msg/PoseArray"
+  gz_type_name: "gz.msgs.Pose_V"
+  subscriber_queue: 1
+  publisher_queue: 1
+  lazy: false
+  direction: GZ_TO_ROS
+
+# ROS to Gazebo Bridge
+
+# TOPICS
+
+# gz topic subscribed to by DiffDrive plugin
+- ros_topic_name: "cmd_vel"
+  gz_topic_name: "/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  subscriber_queue: 1
+  publisher_queue: 1
+  lazy: false
+  direction: ROS_TO_GZ

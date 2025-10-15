@@ -1,0 +1,6 @@
+# Req
+string gz_partition
+string parameters
+---
+# Result
+bool success

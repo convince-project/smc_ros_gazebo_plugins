@@ -1,0 +1,34 @@
+services:
+  smc_plugins_container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: storm_jazzy_plugin
+    container_name: gz_smc_plugins
+    privileged: true
+    init: true
+    network_mode: host
+    user: "${UID:-1000}:${GID:-1000}"
+    environment:
+      - LOCAL_USER_ID=${UID:-1000}
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /usr/share/glvnd/egl_vendor.d:/usr/share/glvnd/egl_vendor.d:ro
+      - .:/home/ubuntu/smc_gazebo_ws/src:rw
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    stdin_open: true
+    tty: true
+    working_dir: /home/ubuntu/smc_gazebo_ws
+    command: terminator

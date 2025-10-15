@@ -1,0 +1,195 @@
+{
+	"jani-version": 1,
+	"name": "sim-step-fwd",
+	"type": "mdp",
+	"comment": "smc-plugins should be added among the features, but this requires changes in storm core, so we skip for now.",
+	"features": [ "derived-operators" ],
+	"variables": [
+		{
+			"name": "n_steps",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "robot_x",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_y",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_theta",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "bumped_var",
+			"type": "bool",
+			"initial-value": false
+		}
+	],
+	"actions": [
+        {
+            "name": "initialize"
+        },
+		{
+            "name": "increase_counter"
+        },
+		{
+			"name": "call_roamer"
+		}
+    ],
+	"automata": [
+		{
+			"name": "simulation_environment",
+			"locations": [{ "name": "init" }, { "name": "evaluate" }, { "name": "roaming" }, { "name": "end" }],
+			"initial-locations": ["init"],
+			"edges": [
+				{
+					"action": "initialize",
+					"location": "init",
+					"destinations": [
+						{
+							"location": "roaming"
+						}
+					]
+				},
+				{
+					"action": "call_roamer",
+					"location": "roaming",
+					"destinations": [ { "location": "evaluate" } ]
+				},
+				{
+					"action": "increase_counter",
+					"location": "evaluate",
+					"guard": { "exp": "bumped_var" },
+					"destinations": [
+						{
+							"location": "end",
+							"assignments": [
+								{
+									"ref": "n_steps",
+                                    "value": {
+                                        "op": "+",
+                                        "left": "n_steps",
+                                        "right": 1
+                                    },
+									"index": 0
+								}
+							]
+						}
+					]
+				},
+				{
+					"action": "increase_counter",
+					"location": "evaluate",
+					"guard": {
+						"exp": { "op": "¬", "exp": "bumped_var" }
+					},
+					"destinations": [
+						{
+							"location": "roaming",
+							"assignments": [
+								{
+									"ref": "n_steps",
+                                    "value": {
+                                        "op": "+",
+                                        "left": "n_steps",
+                                        "right": 1
+                                    },
+									"index": 0
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"system": {
+		"elements": [ { "automaton": "simulation_environment" } ],
+		"syncs": [
+			{
+				"result": "initialize",
+				"synchronise": [
+					"initialize"
+				]
+			},
+			{
+				"result": "call_roamer",
+				"synchronise": [
+					"call_roamer"
+				]
+			},
+			{
+				"result": "increase_counter",
+				"synchronise": [
+					"increase_counter"
+				]
+			}
+		]
+	},
+	"properties": [
+		{
+			"name": "two_to_nine_steps",
+			"expression": {
+				"op": "filter",
+				"fun": "max",
+				"states": { "op": "initial" },
+				"values": {
+					"op": "Pmin",
+					"exp": {
+						"comment": "The robot performs at least one random move without bumping, and bumps before the 10th step.",
+						"op": "U",
+						"left": { "op": "<", "left": "n_steps", "right": 10 },
+						"right": {
+							"op": "∧",
+							"left": "bumped_var",
+							"right": { "op": ">", "left": "n_steps", "right": 1 }
+						}
+					}
+				}
+			}
+		}
+	],
+
+	"plugins": [
+		{
+			"plugin_id": "handle_simulation_smc_plugin",
+			"automaton_id": "simulation_environment",
+			"action_name": "initialize",
+			"init": [
+			],
+			"output": [
+			]
+		},
+		{
+			"plugin_id": "roamer_smc_plugin",
+			"automaton_id": "simulation_environment",
+			"action_name": "call_roamer",
+			"init": [
+			],
+			"output": [
+				{
+					"ref": "robot_x",
+					"value": "robot_pose_x"
+				},
+				{
+					"ref": "robot_y",
+					"value": "robot_pose_y"
+				},
+				{
+					"ref": "robot_theta",
+					"value": "robot_pose_theta"
+				},
+				{
+					"ref": "bumped_var",
+					"value": "bumped"
+				}
+			]
+		}
+	]
+}

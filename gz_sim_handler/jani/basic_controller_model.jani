@@ -1,0 +1,513 @@
+{
+	"jani-version": 1,
+	"name": "sim-step-fwd",
+	"type": "mdp",
+	"comment": "smc-plugins should be added among the features, but this requires changes in storm core, so we skip for now.",
+	"features": [ "derived-operators" ],
+	"variables": [
+		{
+			"name": "curr_time",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_x",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_y",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_theta",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_x_vel",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_theta_vel",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_scan_fl",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_scan_f",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "robot_scan_fr",
+			"type": "real",
+			"initial-value": 0.0
+		},
+		{
+			"name": "keep_turning",
+			"type": "bool",
+			"initial-value": false
+		},
+		{
+			"name": "obstacle_found",
+			"type": "bool",
+			"initial-value": false
+		},
+		{
+			"name": "rotation_direction",
+			"type": "real",
+			"initial-value": 1.0
+		}
+	],
+	"constants": [
+		{
+			"name": "danger_distance",
+			"type": "real",
+			"value": 0.3
+		},
+		{
+			"name": "critical_distance",
+			"type": "real",
+			"value": 0.15
+		},
+		{
+			"name": "max_lin_vel",
+			"type": "real",
+			"value": 0.3
+		},
+		{
+			"name": "max_ang_vel",
+			"type": "real",
+			"value": 1.0
+		},
+		{
+			"name": "goal_x",
+			"type": "real",
+			"value": 0.0
+		},
+		{
+			"name": "goal_y",
+			"type": "real",
+			"value": 2.0
+		},
+		{
+			"name": "timeout",
+			"type": "real",
+			"value": 40.0
+		}
+	],
+	"actions": [
+        {
+            "name": "step_fwd"
+        },
+		{
+            "name": "check_obstacle"
+        },
+		{
+            "name": "compute_vel"
+        },
+		{
+            "name": "compute_turn_direction"
+        },
+		{
+            "name": "compute_turn_vel"
+        },
+		{
+            "name": "drive_fwd"
+        }
+    ],
+	"automata": [
+		{
+			"name": "simulation_environment",
+			"locations": [
+				{ "name": "ready_to_step" },
+				{ "name": "get_obstacle" },
+				{ "name": "get_vel" },
+				{ "name": "get_turn_vel" },
+				{ "name": "send_vel" },
+				{ "name": "increasing" }
+			],
+			"initial-locations": ["ready_to_step"],
+			"edges": [
+				{
+					"action": "step_fwd",
+					"location": "ready_to_step",
+					"destinations": [
+						{
+							"location": "get_obstacle"
+						}
+					]
+				},
+				{
+					"action": "check_obstacle",
+					"location": "get_obstacle",
+					"destinations": [
+						{
+							"location": "get_vel",
+							"assignments": [
+								{
+									"ref": "obstacle_found",
+									"value": {
+										"op": "∨",
+										"left": {
+											"op": "∨",
+											"left": {
+												"op": "<",
+												"left": "robot_scan_fl",
+												"right": "danger_distance"
+											},
+											"right": {
+												"op": "<",
+												"left": "robot_scan_f",
+												"right": "danger_distance"
+											}
+										},
+										"right": {
+											"op": "<",
+											"left": "robot_scan_fr",
+											"right": "danger_distance"
+										}
+									},
+									"index": 0
+								},
+								{
+									"ref": "keep_turning",
+									"value": {
+										"op": "∧",
+										"left": "keep_turning",
+										"right": "obstacle_found"
+									},
+									"index": 1
+								}
+							]
+						}
+					]
+				},
+				{
+					"action": "compute_vel",
+					"location": "get_vel",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": "obstacle_found"
+						}
+					},
+					"destinations": [
+						{
+							"location": "send_vel"
+						}
+					]
+				},
+				{
+					"action": "compute_turn_direction",
+					"location": "get_vel",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": "obstacle_found",
+							"right": {
+								"op": "¬",
+								"exp": "keep_turning"
+							}
+						}
+					},
+					"destinations": [
+						{
+							"location": "get_turn_vel",
+							"assignments": [
+								{
+									"ref": "rotation_direction",
+									"value": {
+										"op": "ite",
+										"if": {
+											"op": ">",
+											"left": "robot_theta_vel",
+											"right": 0
+										},
+										"then": 1.0,
+										"else": -1.0
+									}
+								},
+								{
+									"ref": "keep_turning",
+									"value": true
+								}
+							]
+						}
+					]
+				},
+				{
+					"action": "compute_turn_direction",
+					"location": "get_vel",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": "obstacle_found",
+							"right": "keep_turning"
+						}
+					},
+					"destinations": [
+						{
+							"location": "get_turn_vel"
+						}
+					]
+				},
+				{
+					"action": "compute_turn_vel",
+					"location": "get_turn_vel",
+					"destinations": [
+						{
+							"location": "send_vel",
+							"assignments": [
+								{
+									"ref": "robot_theta_vel",
+									"value": {
+										"op": "*",
+										"left": "rotation_direction",
+										"right": "max_ang_vel"
+									}
+								},
+								{
+									"ref": "robot_x_vel",
+									"value": 0.0
+								}
+							]
+						}
+					]
+				},
+				{
+					"action": "drive_fwd",
+					"location": "send_vel",
+					"destinations": [
+						{
+							"location": "ready_to_step"
+						}
+					]
+				}
+			]
+		}
+	],
+	"system": {
+		"elements": [ { "automaton": "simulation_environment" } ],
+		"syncs": [
+			{
+				"result": "step_fwd",
+				"synchronise": [
+					"step_fwd"
+				]
+			},
+			{
+				"result": "check_obstacle",
+				"synchronise": [
+					"check_obstacle"
+				]
+			},
+			{
+				"result": "compute_vel",
+				"synchronise": [
+					"compute_vel"
+				]
+			},
+			{
+				"result": "compute_turn_direction",
+				"synchronise": [
+					"compute_turn_direction"
+				]
+			},
+			{
+				"result": "compute_turn_vel",
+				"synchronise": [
+					"compute_turn_vel"
+				]
+			},
+			{
+				"result": "drive_fwd",
+				"synchronise": [
+					"drive_fwd"
+				]
+			}
+		]
+	},
+	"properties": [
+		{
+			"name": "driving",
+			"comment": "Robot driving at least 1 meter in up to 5 seconds.",
+			"expression": {
+				"op": "filter",
+				"fun": "max",
+				"states": { "op": "initial" },
+				"values": {
+					"op": "Pmin",
+					"exp": {
+						"op": "U",
+						"left": {
+							"op": "<",
+							"left": "curr_time",
+							"right": "timeout"
+						},
+						"right": {
+							"op": "∧",
+							"left": {
+								"op": "<",
+								"left": {
+									"op": "abs",
+									"exp": {
+										"op": "-",
+										"left": "robot_x",
+										"right": "goal_x"
+	
+									}
+								},
+								"right": 0.01
+							},
+							"right": {
+								"op": "<",
+								"left": {
+									"op": "abs",
+									"exp": {
+										"op": "-",
+										"left": "robot_y",
+										"right": "goal_y"
+	
+									}
+								},
+								"right": 0.01
+							}
+						}
+					}
+				}
+			}
+		}
+	],
+	"plugins": [
+		{
+			"plugin_id": "gazebo_step_smc_plugin",
+			"automaton_id": "simulation_environment",
+			"action_name": "step_fwd",
+			"init": [
+				{
+					"name": "step_time",
+					"type": "real",
+					"value": 0.01,
+					"comment": "How much (per step) the simulation time should advance."
+				},
+				{
+					"name": "n_steps",
+					"type": "int",
+					"value": 20,
+					"comment": "How many steps to execute each time the plugin receives an input (steps fwd)."
+				}
+			],
+			"output": [
+				{
+					"ref": "curr_time",
+					"value": "sim_time"
+				},
+				{
+					"ref": "robot_x",
+					"value": "robot_pose_x"
+				},
+				{
+					"ref": "robot_y",
+					"value": "robot_pose_y"
+				},
+				{
+					"ref": "robot_theta",
+					"value": "robot_pose_theta"
+				},
+				{
+					"ref": "robot_scan_fl",
+					"value": "distance_front_left"
+				},
+				{
+					"ref": "robot_scan_f",
+					"value": "distance_front"
+				},
+				{
+					"ref": "robot_scan_fr",
+					"value": "distance_front_right"
+				}
+			]
+		},
+		{
+			"plugin_id": "gazebo_drive_smc_plugin",
+			"automaton_id": "simulation_environment",
+			"action_name": "drive_fwd",
+			"init": [],
+			"input": [
+				{
+					"name": "lin_vel",
+					"type": "real",
+					"value": "robot_x_vel"
+				},
+				{
+					"name": "ang_vel",
+					"type": "real",
+					"value": "robot_theta_vel"
+				}
+			],
+			"output": []
+		},
+		{
+			"plugin_id": "vel_to_goal_smc_plugin",
+			"automaton_id": "simulation_environment",
+			"action_name": "compute_vel",
+			"init": [
+				{
+					"name": "max_lin_vel",
+					"type": "real",
+					"value": 0.3,
+					"comment": "Max linear velocity."
+				},
+				{
+					"name": "max_ang_vel",
+					"type": "real",
+					"value": 1.0,
+					"comment": "Max angular velocity."
+				}
+			],
+			"input": [
+				{
+					"name": "robot_pose_x",
+					"type": "real",
+					"value": "robot_x"
+				},
+				{
+					"name": "robot_pose_y",
+					"type": "real",
+					"value": "robot_y"
+				},
+				{
+					"name": "robot_pose_theta",
+					"type": "real",
+					"value": "robot_theta"
+				},
+				{
+					"name": "goal_pose_x",
+					"type": "real",
+					"value": "goal_x"
+				},
+				{
+					"name": "goal_pose_y",
+					"type": "real",
+					"value": "goal_y"
+				}
+			],
+			"output": [{
+					"ref": "robot_x_vel",
+					"value": "lin_vel"
+				},
+				{
+					"ref": "robot_theta_vel",
+					"value": "ang_vel"
+				}]
+		}
+	]
+}

@@ -1,0 +1,86 @@
+{
+    "storm_parameters": {
+        "computed": {
+            "model": {
+                "package_name": "gz_sim_handler",
+                "path":"jani/roamer_model.jani"
+            },
+            "plugin-paths": {
+                "package_name":"ros_smc_plugins",
+                "path": "lib/ros_smc_plugins"
+            }
+        },
+        "fixed":{
+            "properties-names": "two_to_nine_steps",
+            "batch-size": "1",
+            "max-n-traces": "400",
+            "disable-explored-states-caching": true,
+            "n-threads": "4",
+            "traces-folder": "/tmp/roamer",
+            "append-date": true,
+            "show-statistics": true
+        }
+    },
+    "spawner_parameters": {
+        "max_threads": 5,
+        "command": "ros2 launch gz_sim_handler start_gazebo_and_bridge_launch.py",
+        "simulation_parameters": {
+            "bridge_configuration": {
+                "package_name": "gz_sim_handler",
+                "file": "config/ros_bridge.yaml"
+            },
+            "gazebo": {
+                "world": {
+                    "package_name": "gz_sim_handler",
+                    "path": "worlds",
+                    "file": "turtlebot3_world.sdf"
+                },
+                "parameters": [
+                    "-v", "1",
+                    "-s", "--headless-rendering",
+                    "-r"
+                ]
+            },
+            "robots": [
+                {
+                    "file": {
+                        "package_name": "turtlebot3_gazebo",
+                        "path": "models",
+                        "file": "turtlebot3_waffle/model.sdf"
+                    },
+                    "model":{
+                        "package_name": "turtlebot3_gazebo",
+                        "path": "urdf",
+                        "file": "turtlebot3_waffle.urdf"
+                    },
+                    "fixed_parameters": {
+                        "-entity": "waffle",
+                        "-name": "waffle",
+                        "-allow_renaming": "true",
+                        "-x": "-2.0",
+                        "-y": "-0.5",
+                        "-z": "0.01",
+                        "-Y": "0.0"
+                    }
+                }
+            ],
+            "additional_nodes": [
+                {
+                    "package_name": "gz_sim_handler",
+                    "node_name": "scan_processor_node"
+                },
+                {
+                    "package_name": "roamer_pkg",
+                    "node_name": "pose_publisher.py"
+                },
+                {
+                    "package_name": "roamer_pkg",
+                    "node_name": "roamer_server_node",
+                    "parameters": {
+                        "use_sim_time": true
+                    }
+                }
+            ]
+        }
+    }
+}

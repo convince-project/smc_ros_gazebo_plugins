@@ -1,0 +1,13 @@
+# Goal
+float64 angle_rad    
+float64 distance_m   
+---
+# Result
+geometry_msgs/Pose pose
+bool bumped
+bool finished
+---
+# Feedback
+geometry_msgs/Pose pose
+bool bumped
+bool finished

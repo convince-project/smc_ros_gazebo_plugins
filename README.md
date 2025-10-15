@@ -55,11 +55,11 @@ Additional commands for visualization and plotting are presented in the sections
 
 For the first and the second experiment, we rely on the statistical model checker to control the simulation completely: this means that the simulation is normally paused, and it steps forward by a specific amount of time only after this is requested by the model checker.
 
-This experiments uses the plugins developed in the [gazebo_smc_plugins package](gazebo_smc_plugins) and the [basic_controller_model.jani model](gz_sim_handler/jani/basic_controller_model.jani).
+This experiments uses the SMC plugins developed in the [gazebo_smc_plugins package](gazebo_smc_plugins) and the [basic_controller_model.jani model](gz_sim_handler/jani/basic_controller_model.jani).
 
 This image gives an overview of the model.
 
-![Controller model](images/sim_step_model.drawio.svg)
+![Obstacle avoidance model](images/sim_step_model.drawio.svg)
 
 The red arrows are related to edges associated to an SMC Plugin, while the other edges are implemented directly in JANI.
 The model does the following operation:
@@ -77,7 +77,7 @@ ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg 
 
 This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
-In XTerm, SMC Storm will provide information on the current status of the experiment, reporting on the right side how many traces satisfied the property (*S*uccess), how many did not satisfy the property (*F*ailure) and how many did not terminate correctly (*U*nknown).
+In XTerm, SMC Storm will provide information on the current status of the experiment, reporting on the right side how many traces satisfied the property (*S*uccess), how many did not satisfy the property (*F*ailure) and how many failed to terminate correctly (*U*nknown).
 The percentage value relates to how the chosen statistical method is converging to the desired result (by default, we are using the Adaptive Sampling Method, with an 95% Confidence Score and an Epsilon of 0.01).
 
 Below, an exemplary progress bar from SMC Storm, after generating 128 traces:
@@ -102,12 +102,16 @@ Once finished, the xterm terminal running smc_storm should report a result simil
 Result: 0.679197995
 ```
 
+At this point, the XTerm terminal can be closed, and the experiment is finished.
+
 ### Experiment 2: Controller with refined recovery (obstacle-avoidance)
 
 This model is a small refinement of the one from the 1st experiment, with a more refined handling of the case with obstacles in front of the robot.
 
 It relies on the same plugins used in the previous experiment.
 The only difference lies on the handling of the obstacles in front of the robot: the robot starts spinning only in case the front side detects an obstacle (ignoring the front-left and front-right side), and once it starts, it keeps rotating until all three sides are free.
+
+The JANI model containing the refined model can be found in [refined_controller_model.jani](gz_sim_handler/jani/refined_controller_model.jani). As for the previous model, it makes use of the SMC plugins provided in the [gazebo_smc_plugins package](gazebo_smc_plugins).
 
 To start the second experiment, run the following:
 
@@ -133,6 +137,8 @@ Once finished, the xterm terminal running smc_storm should report a result simil
 Result: 0.9625
 ```
 
+At this point, the XTerm terminal can be closed, and the experiment is finished.
+
 ### Experiment 3: Random roamer
 
 This model relies on a completely different philosophy, expecting the simulation to be always running, and reading the state from the simulation when the plugin is executed, without the need of pausing/unpausing the simulation each time.
@@ -141,7 +147,9 @@ The experiment itself consists of a robot moving randomly in a room until it bum
 
 The model itself is shown in the following picture.
 
-![Controller model](images/roamer_diagram.drawio.svg)
+![Roamer model](images/roamer_diagram.drawio.svg)
+
+It relies on the [roamer_model.jani model](gz_sim_handler/jani/roamer_model.jani), that in turns makes use of the SMC plugins provided in the [ros_smc_plugins package](ros_smc_plugins).
 
 To start the third experiment, run the following:
 
@@ -167,6 +175,8 @@ Once finished, the xterm terminal running smc_storm should report a result simil
 =========================================
 Result: 0.3053435115
 ```
+
+At this point, the XTerm terminal can be closed, and the experiment is finished.
 
 ### Optional: visualize the running experiment
 

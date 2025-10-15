@@ -75,7 +75,16 @@ To start the first experiment, run the following:
 ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_basic_controller.json storm_in_xterm:=true
 ```
 
-This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration).
+This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
+
+In XTerm, SMC Storm will provide information on the current status of the experiment, reporting on the right side how many traces satisfied the property (*S*uccess), how many did not satisfy the property (*F*ailure) and how many did not terminate correctly (*U*nknown).
+The percentage value relates to how the chosen statistical method is converging to the desired result (by default, we are using the Adaptive Sampling Method, with an 95% Confidence Score and an Epsilon of 0.01).
+
+Below, an exemplary progress bar from SMC Storm, after generating 128 traces:
+
+```
+[--------------------------------------------------] 0%  (S: 88 F: 40 U: 0)     
+```
 
 Once finished, the xterm terminal running smc_storm should report a result similar to the following one:
 ```
@@ -106,7 +115,7 @@ To start the second experiment, run the following:
 ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_refined_controller.json storm_in_xterm:=true
 ```
 
-This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration).
+This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
 Once finished, the xterm terminal running smc_storm should report a result similar to the following one:
 ```
@@ -140,7 +149,7 @@ To start the third experiment, run the following:
 ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_roamer.json storm_in_xterm:=true
 ```
 
-This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration).
+This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
 Once finished, the xterm terminal running smc_storm should report a result similar to the following one:
 

@@ -26,7 +26,8 @@ The docker image that we are going to build will contain:
 
 *Important:* the robot simulation relies on the GPU to work, therefore the Docker container needs to use the nvidia-container-toolkit, that can be installed following [this guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
 
-Once the nvidia-container-toolkit is available, the docker image can be built using docker compose:
+Once the nvidia-container-toolkit is available, the docker image can be built using docker compose.
+To do that, go to the main package folder, containing the `docker_compose.yaml` file, and run:
 
 ```bash
 docker compose -f docker_compose.yaml build smc_plugins_container

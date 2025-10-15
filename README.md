@@ -180,7 +180,7 @@ At this point, the XTerm terminal can be closed, and the experiment is finished.
 
 ### Optional: visualize the running experiment
 
-Optionally, it is possible to visualize the running simulation using the Gazebo GUI. This can be done while the experiment is running, executing the commands below in a new terminal within the container (from the terminator instance, you can use `Ctrl + Shift + O` to split the terminal in two):
+Optionally, it is possible to visualize the running simulation using the Gazebo GUI. This can be done while the experiment is running: first split the current terminal within the running container in two, pressing `Ctrl + Shift + O`. Then, in the new terminal, run the commands below:
 ```bash
 # The partition name is thread dependent: robot0, robot1, ..., robotN
 export GZ_PARTITION=robot0
@@ -191,7 +191,7 @@ gz sim -g
 
 Each trace that is generated during the experiments is exported as an own CSV file. It can be found in the container's `/tmp` folder, and can be inspected either with a normal text editor, or by plotting tools as `plotjuggler` (recommended).
 
-To open a trace using plotjuggler, you can use the following command (assuming the traces are generated in the `basic_controller_2025-10-01-07-14-35` folder):
+To open a trace using plotjuggler, you can use the following command (assuming the traces are generated in the `basic_controller_2025-10-01-07-14-35` folder, and one trace is called `trace_47_000005_not_verified.csv`):
 
 ```bash
 cd /tmp/basic_controller_2025-10-01-07-14-35
@@ -202,8 +202,8 @@ The trace name is structured as follows: `trace_<thread-id>_<trace-number>_<eval
 
 Once plotjuggler opens, select "Use row number as X axis" in the "CSV Loader" window, confirm by pressing OK, and load the desired entries in the plot.
 
-Note that there might be a prompt about a new version of plotjuggler being available, that hides under the "CSV Loader" window and prevents from using it.
-In that case, close the New version window first and then continue with the CSV loading configuration.
+*Important note:* there might be a prompt about a new version of plotjuggler being available, that hides behind the "CSV Loader" window and prevents from using it.
+In that case, close that "new version" window first, and then continue with the CSV loading configuration.
 
 An exemplary outcome (from the first experiment) is the following:
 
@@ -211,7 +211,7 @@ An exemplary outcome (from the first experiment) is the following:
 
 ## Optional: Running the single components by hand
 
-Using ROS 2 Launch, allows us to start multiple processes at once with a single command.
+Using ROS 2 Launch, as described in the experiments above, allows us to start multiple processes at once with a single command.
 
 In case it is desired to start the single processes composing the experiments by hand, we provide instructions on how to run them in the [Manual-instructions.md file](Manual-instructions.md).
 

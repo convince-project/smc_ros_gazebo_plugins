@@ -47,7 +47,7 @@ This will open a new `terminator` terminal, that can be used to execute the comm
 ### Run the experiments
 
 The subsections below provide with the exact command to run the experiments. Each experiment launches the SMC tool (smc_storm) together with the `spawn_simulation_ros.py` python node, that will create and destroy the robot simulation outside of the SMC tool based on request (each time the SMC tool starts a trace, a new simulation is created, and once it finishes, it is destroyed).
-Optionally, the experiment command can start the SMC tool in a separated xterm session, to better separate the different output from the different tools.
+Optionally, the experiment command can start the SMC tool in a separated XTerm session, to better separate the different output from the different tools.
 
 Additional commands for visualization and plotting are presented in the sections after the experiments.
 
@@ -86,7 +86,7 @@ Below, an exemplary progress bar from SMC Storm, after generating 128 traces:
 [--------------------------------------------------] 0%  (S: 88 F: 40 U: 0)     
 ```
 
-Once finished, the xterm terminal running smc_storm should report a result similar to the following one:
+Once finished, the XTerm terminal running smc_storm should report a result similar to the following one:
 ```
 ============= SMC Results =============
         N. of times target reached:     271
@@ -121,7 +121,7 @@ ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg 
 
 This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
-Once finished, the xterm terminal running smc_storm should report a result similar to the following one:
+Once finished, the XTerm terminal running smc_storm should report a result similar to the following one:
 ```
 ============= SMC Results =============
         N. of times target reached:     385
@@ -159,7 +159,7 @@ ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg 
 
 This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
-Once finished, the xterm terminal running smc_storm should report a result similar to the following one:
+Once finished, the XTerm terminal running smc_storm should report a result similar to the following one:
 
 ```
 ============= SMC Results =============

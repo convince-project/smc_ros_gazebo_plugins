@@ -99,7 +99,7 @@ RUN source /opt/ros/jazzy/setup.bash && \
     rosdep install --from-paths src --ignore-src -r -y && \
     colcon build --packages-up-to ros_gz_bridge --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --event-handlers console_cohesion+ && \
     rm -rf src
-    
+
 # Prepare required directories
 WORKDIR /home/$USER/
 RUN mkdir -p smc_gazebo_ws/src
@@ -118,10 +118,6 @@ RUN source /opt/ros/jazzy/setup.bash && \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --event-handlers console_cohesion+
 
 # Prepare the bashrc file
-RUN echo "export GZ_VERSION=harmonic" >> /home/$USER/.bashrc
-RUN echo "export GZ_CONFIG_PATH=/opt/ros/jazzy/opt/gz_sim_vendor/share/gz" >> /home/$USER/.bashrc
-RUN echo "export RMW_IMPLEMENTATION=rmw_zenoh_cpp" >> /home/$USER/.bashrc
-RUN echo "source /home/$USER/smc_gazebo_ws/install/setup.bash" >> /home/$USER/.bashrc
 RUN echo "alias colcon-clean-ws='rm -rf build install log'" >> /home/$USER/.bashrc
 RUN echo "alias colcon-build-ws='colcon build --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --event-handlers console_cohesion+ --symlink-install'" >> /home/$USER/.bashrc
 
@@ -131,5 +127,8 @@ RUN chown -R $UID:$GID /home/$USER
 # Clean APT cache
 RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
+CMD /bin/bash
+COPY Docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 # Default to bash
-ENTRYPOINT [""]
+ENTRYPOINT ["/entrypoint.sh"]

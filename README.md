@@ -3,6 +3,7 @@
 In this repository, we show how it is possible to use Statistical Model Checking (SMC) plugins to verify a robotic system that is partly implemented using ROS 2 and Gazebo.
 This repository is connected to the article "Integrating External Components in JANI Models Using SMC Plugins".
 Please find the up-to-date content of this repository at https://github.com/convince-project/smc_ros_gazebo_plugins .
+This content is available on Zenodo: https://doi.org/10.5281/zenodo.17359748 .
 
 ## Repository content
 
@@ -14,6 +15,32 @@ The repository consists of the following packages:
 * *ros_smc_plugins*: containing the implementation of the SMC plugins interfacing with the roamer server, used for experiment 3;
 * *roamer_pkg*: containing the roamer server, that drives the simulated robot upon request
 
+## Pre-requisites
+
+To run the examples in this artifact, the platform needs to satisfy the following pre-requisites:
+* It runs on Ubuntu (22.04 or higher)
+* An NVidia-GPU is available, and related drivers are installed
+* Docker is available, with the additional nvidia-container-toolkit
+
+### Verify system compatibility
+
+To test the correct configuration of the GPU, it is possible to use NVidia SMI.
+Run:
+
+```bash
+nvidia-smi
+```
+
+and check if it can detect a graphic card. If not, the Nvidia drivers are not working correctly, and the experiments won't be able to run.
+
+To check if the nvidia-container-toolkit is installed, run:
+
+```bash
+nvidia-container-toolkit -version
+```
+
+and check if the system can find it. If not, you can use [this guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) for installing it.
+
 ## Installation
 
 To ensure reproducibility, we recommend using the provided Docker setup, using the Ubuntu 24.04 image and ROS jazzy.
@@ -24,13 +51,11 @@ The docker image that we are going to build will contain:
 * SMC Storm
 * Different SMC Plugins, used to communicate with Gazebo and control a wheeled robot
 
-*Important:* the robot simulation relies on the GPU to work, therefore the Docker container needs to use the nvidia-container-toolkit, that can be installed following [this guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
-
-Once the nvidia-container-toolkit is available, the docker image can be built using docker compose.
+The docker image can be built using docker compose.
 To do that, go to the main package folder, containing the `docker_compose.yaml` file, and run:
 
 ```bash
-docker compose -f docker_compose.yaml build smc_plugins_container
+docker compose -f docker_compose.yaml build base_container
 ```
 
 ## Running the experiments
@@ -40,17 +65,53 @@ docker compose -f docker_compose.yaml build smc_plugins_container
 The docker container can be started using docker compose, using the command:
 
 ```bash
-docker compose -f docker_compose.yaml run --rm smc_plugins_container
+docker compose -f docker_compose.yaml run --rm experiment_<one/two/three>
 ```
 
-This will open a new `terminator` terminal, that can be used to execute the commands in the next sections to run the experiments.
+This command will start the simulation, and open a new `xterm` terminal, that can be used to visualize the status of verification on the SMC tool (smc_storm).
+
+Due to limitations from the robot simulation engine, experiments shall be executed independently: please do not try to execute multiple experiments in parallel!
+
+Each experiments takes roughly 20 minutes, 14 GB of RAM and a large part of your CPU (with an Intel i7-11850H with 16 threads, it takes around 70% CPU).
 
 ### Run the experiments
 
 The subsections below provide with the exact command to run the experiments. Each experiment launches the SMC tool (smc_storm) together with the `spawn_simulation_ros.py` python node, that will create and destroy the robot simulation outside of the SMC tool based on request (each time the SMC tool starts a trace, a new simulation is created, and once it finishes, it is destroyed).
-Optionally, the experiment command can start the SMC tool in a separated XTerm session, to better separate the different output from the different tools.
+The experiment command starts the SMC tool in a separated XTerm session, to better separate the different output from the different running processes.
+
+Details on the configuration of each tool for each experiment can be found in the [configuration files folder](gz_sim_handler/config/).
 
 Additional commands for visualization and plotting are presented in the sections after the experiments.
+
+### Quick test before running the complete experiments:
+
+We provide a shorter version of experiment 1, to test whether everything works as expected.
+It can be executed using:
+```bash
+docker compose -f docker_compose.yaml run --rm experiment_quick
+```
+
+Check whether the result from the SMC tool is similar to the following one:
+```
+============= SMC Results =============
+        N. of times target reached:     4
+        N. of times no termination:     1
+        Tot. n. of tries (samples):     8
+        Estimated success prob.:        0.5714285714
+        Confidence score: 0.95
+        Estimated Epsilon: 0.339773 (Corrected Wilson Method)
+
+        Min trace length:       0
+        Max trace length:       975
+=========================================
+Result: 0.5714285714
+```
+
+In particular, make sure that the amount of traces with no termination (errors) is low (up to 2, due to possible issues at startup).
+
+As soon as the results are ready, it is possible to close the xterm terminal and proceed with the complete experiments.
+
+This small test should take one minute.
 
 ### Experiment 1: Basic controller (obstacle-avoidance)
 
@@ -73,10 +134,10 @@ The model does the following operation:
 To start the first experiment, run the following:
 
 ```bash
-ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_basic_controller.json storm_in_xterm:=true
+docker compose -f docker_compose.yaml run --rm experiment_one
 ```
 
-This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
+This command will run the experiment on 4 parallel threads, *and will take ~ 20 minutes* to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
 In XTerm, SMC Storm will provide information on the current status of the experiment, reporting on the right side how many traces satisfied the property (*S*uccess), how many did not satisfy the property (*F*ailure) and how many failed to terminate correctly (*U*nknown).
 The percentage value relates to how the chosen statistical method is converging to the desired result (by default, we are using the Adaptive Sampling Method, with an 95% Confidence Score and an Epsilon of 0.01).
@@ -117,10 +178,10 @@ The JANI model containing the refined model can be found in [refined_controller_
 To start the second experiment, run the following:
 
 ```bash
-ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_refined_controller.json storm_in_xterm:=true
+docker compose -f docker_compose.yaml run --rm experiment_two
 ```
 
-This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
+This command will run the experiment on 4 parallel threads, *and will take ~ 20 minutes* to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
 Once finished, the XTerm terminal running smc_storm should report a result similar to the following one:
 ```
@@ -155,10 +216,10 @@ It relies on the [roamer_model.jani model](gz_sim_handler/jani/roamer_model.jani
 To start the third experiment, run the following:
 
 ```bash
-ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_roamer.json storm_in_xterm:=true
+docker compose -f docker_compose.yaml run --rm experiment_three
 ```
 
-This command will run the experiment on 4 parallel threads, and will take ~ 20 minutes to generate a result based on 400 traces (limited in the configuration for execution time reasons).
+This command will run the experiment on 4 parallel threads, *and will take ~ 20 minutes* to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
 Once finished, the XTerm terminal running smc_storm should report a result similar to the following one:
 
@@ -181,23 +242,37 @@ At this point, the XTerm terminal can be closed, and the experiment is finished.
 
 ### Optional: visualize the running experiment
 
-Optionally, it is possible to visualize the running simulation using the Gazebo GUI. This can be done while the experiment is running: first split the current terminal within the running container in two, pressing `Ctrl + Shift + O`. Then, in the new terminal, run the commands below:
+Optionally, it is possible to visualize the running simulation using the Gazebo GUI. This can be done while the experiment is running.
+To do that, open a new terminal and execute the command:
+
 ```bash
-# The partition name is thread dependent: robot0, robot1, ..., robotN
-export GZ_PARTITION=robot0
-gz sim -g
+docker compose -f docker_compose.yaml run --rm visualize_sim_<0/1/2/3>
 ```
+selecting between 0, 1, 2 or 3 depending on which of the four thread you want to visualize.
+
+The result will look like in this image:
+
+![Roamer model](images/gazebo_sim.png)
 
 ### Optional: visualize the exported traces
 
 Each trace that is generated during the experiments is exported as an own CSV file. It can be found in the container's `/tmp` folder, and can be inspected either with a normal text editor, or by plotting tools as `plotjuggler` (recommended).
 
-To open a trace using plotjuggler, you can use the following command (assuming the traces are generated in the `basic_controller_2025-10-01-07-14-35` folder, and one trace is called `trace_47_000005_not_verified.csv`):
+To access the traces, you can access the running container using:
 
 ```bash
-cd /tmp/basic_controller_2025-10-01-07-14-35
-ros2 run plotjuggler plotjuggler -n -d trace_47_000005_not_verified.csv
+docker compose -f docker_compose.yaml exec experiment_<one/two/three> terminator
 ```
+
+In the new terminal, it is possible to open a trace using plotjuggler with the following command:
+
+```bash
+source install/setup.bash
+cd /tmp/<traces-folder>
+ros2 run plotjuggler plotjuggler -n -d <trace_csv_file>
+```
+
+having care to substitute the folder and the trace names in the command.
 
 The trace name is structured as follows: `trace_<thread-id>_<trace-number>_<evaluation-result>.csv`.
 
@@ -212,9 +287,24 @@ An exemplary outcome (from the first experiment) is the following:
 
 ## Optional: Running the single components by hand
 
-Using ROS 2 Launch, as described in the experiments above, allows us to start multiple processes at once with a single command.
+Using the docker compose commands as described in the experiments above, allows us to conveniently start multiple processes at once with a single command.
 
-In case it is desired to start the single processes composing the experiments by hand, we provide instructions on how to run them in the [Manual-instructions.md file](Manual-instructions.md).
+To get a better overview of the tools, it is possible to start the single processes composing the experiments by hand, we provide instructions on how to run them in the [Manual-instructions.md file](Manual-instructions.md).
+
+## Notes
+
+For this experiments, we always showing SMC plugins running alongside external code and exchanging information using ROS 2.
+However, it is possible to develop plugins that are self-contained, do not require information from external processes (e.g. [vel_to_goal_smc_plugin.cpp](gazebo_smc_plugins/src/vel_to_goal_smc_plugin.cpp), in this repository).
+In case the JANI model uses only self-contained plugins, then the SMC tool can be used on its own, without requiring additional external processes to run in parallel.
+
+Additional information for developing a SMC plugin can be found at the SMC plugins base repository: https://github.com/convince-project/smc_verifiable_plugins .
+
+## ETAPS Artifact Badges
+
+With this work, we are applying for the following ETAPS Artifact Badges:
+* Available: We make this work available on Github (https://github.com/convince-project/smc_ros_gazebo_plugins) and Zenodo (https://doi.org/10.5281/zenodo.17359748)
+* Functional: We provide a Docker image and related docker compose scripts for reproducing our results.
+* Reusable: This artifact serves as an example for using SMC plugins in JANI models, but it can be applied to different use-cases than the ones in this artifact. The documentation is openly available on GitHub.
 
 ## License
 

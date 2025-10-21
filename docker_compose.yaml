@@ -38,14 +38,14 @@ services:
   experiment_quick:
     extends: base_container
     command: >
-      bash -l -c "
+      bash -c "
         ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_basic_controller_short.json storm_in_xterm:=true
       "
   
   experiment_one:
     extends: base_container
     command: >
-      bash -l -c "
+      bash -c "
         ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_basic_controller.json storm_in_xterm:=true
       "
 

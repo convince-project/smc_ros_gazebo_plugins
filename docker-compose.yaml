@@ -1,0 +1,96 @@
+services:
+  base_container:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: smc_ros_gazebo_plugins
+    container_name: gz_smc_plugins
+    privileged: true
+    init: true
+    network_mode: host
+    user: "${UID:-1000}:${GID:-1000}"
+    environment:
+      - LOCAL_USER_ID=${UID:-1000}
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /usr/share/glvnd/egl_vendor.d:/usr/share/glvnd/egl_vendor.d:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    stdin_open: true
+    tty: true
+    working_dir: /home/ubuntu/smc_gazebo_ws
+
+  terminator:
+    extends: base_container
+    command: terminator
+
+  experiment_quick:
+    extends: base_container
+    command: >
+      bash -c "
+        ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_basic_controller_short.json storm_in_xterm:=true
+      "
+  
+  experiment_one:
+    extends: base_container
+    command: >
+      bash -c "
+        ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_basic_controller.json storm_in_xterm:=true
+      "
+
+  experiment_two:
+    extends: base_container
+    command: >
+      bash -c "
+        ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_refined_controller.json storm_in_xterm:=true
+      "
+
+  experiment_three:
+    extends: base_container
+    command: >
+      bash -c "
+        ros2 launch gz_sim_handler start_ros_and_smc_storm_launch.py config:=$(ros2 pkg prefix --share gz_sim_handler)/config/gazebo_sim_roamer.json storm_in_xterm:=true
+      "
+
+  visualize_sim_0:
+    extends: base_container
+    command: >
+      bash -c "
+        export GZ_PARTITION=robot0
+        gz sim -g
+      "
+
+  visualize_sim_1:
+    extends: base_container
+    command: >
+      bash -c "
+        export GZ_PARTITION=robot1
+        gz sim -g
+      "
+
+  visualize_sim_2:
+    extends: base_container
+    command: >
+      bash -c "
+        export GZ_PARTITION=robot2
+        gz sim -g
+      "
+
+  visualize_sim_3:
+    extends: base_container
+    command: >
+      bash -c "
+        export GZ_PARTITION=robot3
+        gz sim -g
+      "

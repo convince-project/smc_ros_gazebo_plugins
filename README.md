@@ -57,7 +57,7 @@ The docker image can be built using docker compose.
 To do that, go to the main package folder, containing the `docker_compose.yaml` file, and run:
 
 ```bash
-docker compose -f docker_compose.yaml build base_container
+docker compose build base_container
 ```
 
 ## Running the experiments
@@ -67,7 +67,7 @@ docker compose -f docker_compose.yaml build base_container
 The docker container can be started using docker compose, using the command:
 
 ```bash
-docker compose -f docker_compose.yaml run --rm experiment_<one/two/three>
+docker compose run --rm experiment_<one/two/three>
 ```
 
 This command will start the simulation, and open a new `xterm` terminal, that can be used to visualize the status of verification on the SMC tool (smc_storm).
@@ -91,7 +91,7 @@ We provide a shorter version of experiment 1, to test whether everything works a
 It can be executed using:
 
 ```bash
-docker compose -f docker_compose.yaml run --rm experiment_quick
+docker compose run --rm experiment_quick
 ```
 
 Check whether the result from the SMC tool is similar to the following one:
@@ -139,7 +139,7 @@ The model does the following operation:
 To start the first experiment, run the following:
 
 ```bash
-docker compose -f docker_compose.yaml run --rm experiment_one
+docker compose run --rm experiment_one
 ```
 
 This command will run the experiment on 4 parallel threads, *and will take ~ 20 minutes* to generate a result based on 400 traces (limited in the configuration for execution time reasons).
@@ -184,7 +184,7 @@ The JANI model containing the refined model can be found in [refined_controller_
 To start the second experiment, run the following:
 
 ```bash
-docker compose -f docker_compose.yaml run --rm experiment_two
+docker compose run --rm experiment_two
 ```
 
 This command will run the experiment on 4 parallel threads, *and will take ~ 20 minutes* to generate a result based on 400 traces (limited in the configuration for execution time reasons).
@@ -223,7 +223,7 @@ It relies on the [roamer_model.jani model](gz_sim_handler/jani/roamer_model.jani
 To start the third experiment, run the following:
 
 ```bash
-docker compose -f docker_compose.yaml run --rm experiment_three
+docker compose run --rm experiment_three
 ```
 
 This command will run the experiment on 4 parallel threads, *and will take ~ 20 minutes* to generate a result based on 400 traces (limited in the configuration for execution time reasons).
@@ -253,7 +253,7 @@ Optionally, it is possible to visualize the running simulation using the Gazebo 
 To do that, open a new terminal and execute the command:
 
 ```bash
-docker compose -f docker_compose.yaml run --rm visualize_sim_<0/1/2/3>
+docker compose run --rm visualize_sim_<0/1/2/3>
 ```
 
 selecting between 0, 1, 2 or 3 depending on which of the four thread you want to visualize.
@@ -269,7 +269,7 @@ Each trace that is generated during the experiments is exported as an own CSV fi
 To access the traces, you can access the running container using:
 
 ```bash
-docker compose -f docker_compose.yaml exec experiment_<one/two/three> terminator
+docker compose exec experiment_<one/two/three> terminator
 ```
 
 In the new terminal, it is possible to open a trace using plotjuggler with the following command:

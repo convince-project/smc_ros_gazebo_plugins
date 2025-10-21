@@ -2,8 +2,8 @@
 
 In this repository, we show how it is possible to use Statistical Model Checking (SMC) plugins to verify a robotic system that is partly implemented using ROS 2 and Gazebo.
 This repository is connected to the article "Integrating External Components in JANI Models Using SMC Plugins".
-Please find the up-to-date content of this repository at https://github.com/convince-project/smc_ros_gazebo_plugins .
-This content is available on Zenodo: https://doi.org/10.5281/zenodo.17359748 .
+Please find the up-to-date content of this repository at <https://github.com/convince-project/smc_ros_gazebo_plugins> .
+This content is available on Zenodo: <https://doi.org/10.5281/zenodo.17359748> .
 
 ## Repository content
 
@@ -18,6 +18,7 @@ The repository consists of the following packages:
 ## Pre-requisites
 
 To run the examples in this artifact, the platform needs to satisfy the following pre-requisites:
+
 * It runs on Ubuntu (22.04 or higher)
 * An NVidia-GPU is available, and related drivers are installed
 * Docker is available, with the additional nvidia-container-toolkit
@@ -46,6 +47,7 @@ and check if the system can find it. If not, you can use [this guide](https://do
 To ensure reproducibility, we recommend using the provided Docker setup, using the Ubuntu 24.04 image and ROS jazzy.
 
 The docker image that we are going to build will contain:
+
 * ROS 2 Jazzy
 * ROS Gazebo
 * SMC Storm
@@ -83,15 +85,17 @@ Details on the configuration of each tool for each experiment can be found in th
 
 Additional commands for visualization and plotting are presented in the sections after the experiments.
 
-### Quick test before running the complete experiments:
+### Quick test before running the complete experiments
 
 We provide a shorter version of experiment 1, to test whether everything works as expected.
 It can be executed using:
+
 ```bash
 docker compose -f docker_compose.yaml run --rm experiment_quick
 ```
 
 Check whether the result from the SMC tool is similar to the following one:
+
 ```
 ============= SMC Results =============
         N. of times target reached:     4
@@ -125,6 +129,7 @@ This image gives an overview of the model.
 
 The red arrows are related to edges associated to an SMC Plugin, while the other edges are implemented directly in JANI.
 The model does the following operation:
+
 * Update the model status, asking the simulator (Gazebo) to advance by one step and reading the updated information
 * Check if the robot has an obstacle on its front, front-left or front-right side:
   * If yes, prepare a rotational-only motion (to spin the robot until no obstacle is in front anymore)
@@ -149,6 +154,7 @@ Below, an exemplary progress bar from SMC Storm, after generating 128 traces:
 ```
 
 Once finished, the XTerm terminal running smc_storm should report a result similar to the following one:
+
 ```
 ============= SMC Results =============
         N. of times target reached:     271
@@ -184,6 +190,7 @@ docker compose -f docker_compose.yaml run --rm experiment_two
 This command will run the experiment on 4 parallel threads, *and will take ~ 20 minutes* to generate a result based on 400 traces (limited in the configuration for execution time reasons).
 
 Once finished, the XTerm terminal running smc_storm should report a result similar to the following one:
+
 ```
 ============= SMC Results =============
         N. of times target reached:     385
@@ -248,6 +255,7 @@ To do that, open a new terminal and execute the command:
 ```bash
 docker compose -f docker_compose.yaml run --rm visualize_sim_<0/1/2/3>
 ```
+
 selecting between 0, 1, 2 or 3 depending on which of the four thread you want to visualize.
 
 The result will look like in this image:
@@ -297,12 +305,13 @@ For this experiments, we always showing SMC plugins running alongside external c
 However, it is possible to develop plugins that are self-contained, do not require information from external processes (e.g. [vel_to_goal_smc_plugin.cpp](gazebo_smc_plugins/src/vel_to_goal_smc_plugin.cpp), in this repository).
 In case the JANI model uses only self-contained plugins, then the SMC tool can be used on its own, without requiring additional external processes to run in parallel.
 
-Additional information for developing a SMC plugin can be found at the SMC plugins base repository: https://github.com/convince-project/smc_verifiable_plugins .
+Additional information for developing a SMC plugin can be found at the SMC plugins base repository: <https://github.com/convince-project/smc_verifiable_plugins> .
 
 ## ETAPS Artifact Badges
 
 With this work, we are applying for the following ETAPS Artifact Badges:
-* Available: We make this work available on Github (https://github.com/convince-project/smc_ros_gazebo_plugins) and Zenodo (https://doi.org/10.5281/zenodo.17359748)
+
+* Available: We make this work available on Github (<https://github.com/convince-project/smc_ros_gazebo_plugins>) and Zenodo (<https://doi.org/10.5281/zenodo.17359748>)
 * Functional: We provide a Docker image and related docker compose scripts for reproducing our results.
 * Reusable: This artifact serves as an example for using SMC plugins in JANI models, but it can be applied to different use-cases than the ones in this artifact. The documentation is openly available on GitHub.
 

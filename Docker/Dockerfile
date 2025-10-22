@@ -93,7 +93,7 @@ SHELL ["/bin/bash", "-c"]
 
 # Get ros_gz from source, since APT version has missing features
 WORKDIR /opt/ros_gz
-RUN git clone https://github.com/gazebosim/ros_gz.git --branch jazzy src
+RUN git clone https://github.com/gazebosim/ros_gz.git --branch 1.0.17 src
 RUN source /opt/ros/jazzy/setup.bash && \
     rosdep update && \
     rosdep install --from-paths src --ignore-src -r -y && \

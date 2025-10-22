@@ -57,7 +57,7 @@ The docker image can be built using docker compose.
 To do that, go to the main package folder, containing the `docker_compose.yaml` file, and run:
 
 ```bash
-docker compose build base_container
+docker compose build --pull base_container
 ```
 
 ## Running the experiments
@@ -112,6 +112,7 @@ Result: 0.5714285714
 ```
 
 In particular, make sure that the amount of traces with no termination (errors) is low (up to 2, due to possible issues at startup).
+Given the low number of samples, the "Result" value at the end can be anything between 0.0 and 1.0.
 
 As soon as the results are ready, it is possible to close the xterm terminal and proceed with the complete experiments.
 

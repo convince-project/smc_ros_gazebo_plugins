@@ -2,9 +2,13 @@
 
 To start the single programs composing the experiments, you need to open three terminal sessions in the running container, one for the ROS 2 communication handler (zenoh), one for the simulation handler and one for smc_storm.
 
-To do so you can, after terminator is open, split it into sub-terminals using `Ctrl + Shift + O`.
+To start, you can get a `terminator` terminal running in the docker container by executing:
+```bash
+docker compose run --rm terminator
+```
+A terminator terminal can be split horizontally to obtain three sub-terminals, using `Ctrl + Shift + O`.
 
-The next subsections list the commands to run in the three terminals for each experiment.
+The next subsections list the commands to run in each sub-terminal for each experiment.
 
 ## Experiment 1
 

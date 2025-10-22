@@ -3,7 +3,7 @@
 In this repository, we show how it is possible to use Statistical Model Checking (SMC) plugins to verify a robotic system that is partly implemented using ROS 2 and Gazebo.
 This repository is connected to the article "Integrating External Components in JANI Models Using SMC Plugins".
 Please find the up-to-date content of this repository at <https://github.com/convince-project/smc_ros_gazebo_plugins> .
-This content is available on Zenodo: <https://doi.org/10.5281/zenodo.17359748> .
+This content is available on Zenodo: <https://doi.org/10.5281/zenodo.17359747> .
 
 ## Repository content
 

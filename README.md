@@ -15,7 +15,7 @@ The repository consists of the following packages:
 * *ros_smc_plugins*: containing the implementation of the SMC plugins interfacing with the roamer server, used for experiment 3;
 * *roamer_pkg*: containing the roamer server, that drives the simulated robot upon request
 
-## Updates after reviewers comment
+## Updates for fixing problems reported by the reviewers
 
 ### Problem 1: Building the docker image results in a large memory usage, resulting in the OS crashing
 *Fix:*

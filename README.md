@@ -81,6 +81,8 @@ To do that, go to the main package folder, containing the `docker_compose.yaml` 
 docker compose build --pull base_container
 ```
 
+Depending on your network and your computer, the first time this step could take around one hour.
+
 ## Running the experiments
 
 ### Start the docker container

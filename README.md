@@ -21,6 +21,8 @@ The repository consists of the following packages:
 *Fix:*
 We updated the Docker recipe to limit the amount of parallel threads used to compile both the packages we depend on and our ones.
 This limits the amount of required memory.
+If necessary, try to reduce this number even further depending on the available hardware.
+(See lines 97 and 115 of Docker/Dockerfile)
 
 ### Problem 2: Problem when starting the container for running the experiment
 *Error message:*

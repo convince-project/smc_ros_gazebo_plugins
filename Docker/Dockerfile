@@ -94,7 +94,8 @@ SHELL ["/bin/bash", "-c"]
 # Get ros_gz from source, since APT version has missing features
 WORKDIR /opt/ros_gz
 RUN git clone https://github.com/gazebosim/ros_gz.git --branch 1.0.17 src
-RUN source /opt/ros/jazzy/setup.bash && \
+RUN export MAKEFLAGS="-j 4" && \
+    source /opt/ros/jazzy/setup.bash && \
     rosdep update && \
     rosdep install --from-paths src --ignore-src -r -y && \
     colcon build --packages-up-to ros_gz_bridge --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo --event-handlers console_cohesion+ && \
@@ -111,7 +112,8 @@ ADD roamer_pkg src/roamer_pkg
 ADD ros_smc_plugins src/ros_smc_plugins
 ADD sim_handling_interfaces src/sim_handling_interfaces
 
-RUN source /opt/ros/jazzy/setup.bash && \
+RUN export MAKEFLAGS="-j 4" && \
+    source /opt/ros/jazzy/setup.bash && \
     source /opt/ros_gz/install/setup.bash && \
     rosdep update && \
     rosdep install --from-paths src --ignore-src -r -y && \

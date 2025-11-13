@@ -15,6 +15,29 @@ The repository consists of the following packages:
 * *ros_smc_plugins*: containing the implementation of the SMC plugins interfacing with the roamer server, used for experiment 3;
 * *roamer_pkg*: containing the roamer server, that drives the simulated robot upon request
 
+## Updates for fixing problems reported by the reviewers
+
+### Problem 1: Building the docker image results in a large memory usage, resulting in the OS crashing
+*Fix:*
+We updated the Docker recipe to limit the amount of parallel threads used to compile both the packages we depend on and our ones.
+This limits the amount of required memory.
+If necessary, try to reduce this number even further depending on the available hardware.
+(See lines 97 and 115 of Docker/Dockerfile)
+
+### Problem 2: Problem when starting the container for running the experiment
+*Error message:*
+Error response from daemon: failed to create task for container:
+failed to create shim task: OCI runtime create failed: runc create failed:
+unable to start container process: error during container init: error
+running prestart hook #0: exit status 1, stdout: , stderr: Auto-detected mode as 'legacy'
+nvidia-container-cli: initialization error: load library failed: libnvidia-ml.so.1: cannot open shared object file: no such file or directory: unknown
+*Fix:*
+We did not manage to reproduce the issue, but it seems to be related to the setup of the reviewer's machine. The same issue was reported here: https://github.com/NVIDIA/nvidia-container-toolkit/issues/305
+From what we can see, those are the possible root causes of the issue:
+* Wrong docker package installed (installing `docker.io` instead of `docker-ce`)
+* Docker installation requiring reinstallation: `sudo apt-get install --reinstall docker-ce`
+* Nvidia-drivers requiring to be reinstalled (you can use `sudo ubuntu-drivers install` and select nvidia-driver-535, making sure to pick the proprietary ones, not the open ones)
+
 ## Pre-requisites
 
 To run the examples in this artifact, the platform needs to satisfy the following pre-requisites:
@@ -59,6 +82,8 @@ To do that, go to the main package folder, containing the `docker_compose.yaml` 
 ```bash
 docker compose build --pull base_container
 ```
+
+Depending on your network and your computer, the first time this step could take around 20 minutes.
 
 ## Running the experiments
 
